@@ -57,6 +57,13 @@ class BasicController {
         return "basic/date"
     }
 
+    @GetMapping("/link")
+    fun link(model: Model): String {
+        model.addAttribute("param1", "data1")
+        model.addAttribute("param2", "data2")
+        return "basic/link"
+    }
+
     @Component("helloBean")
     class HelloBean {
         fun hello(data: String): String {
