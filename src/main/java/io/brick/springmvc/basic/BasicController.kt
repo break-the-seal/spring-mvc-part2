@@ -70,6 +70,13 @@ class BasicController {
         return "basic/literal"
     }
 
+    @GetMapping("/operation")
+    fun operation(model: Model): String {
+        model.addAttribute("nullData", null)
+        model.addAttribute("data", "Spring!")
+        return "basic/operation"
+    }
+
     @Component("helloBean")
     class HelloBean {
         fun hello(data: String): String {
