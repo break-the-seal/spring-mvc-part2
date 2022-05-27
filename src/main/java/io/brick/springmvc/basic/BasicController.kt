@@ -94,6 +94,12 @@ class BasicController {
         return "basic/condition"
     }
 
+    @GetMapping("/comments")
+    fun comments(model: Model): String {
+        model.addAttribute("data", "Spring!")
+        return "basic/comments"
+    }
+
     private fun addUsers(model: Model) {
         var list = mutableListOf<User>()
         list.add(User("userA", 10))
