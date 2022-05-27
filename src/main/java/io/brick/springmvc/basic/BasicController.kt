@@ -88,6 +88,12 @@ class BasicController {
         return "basic/each"
     }
 
+    @GetMapping("/condition")
+    fun condition(model: Model): String {
+        addUsers(model)
+        return "basic/condition"
+    }
+
     private fun addUsers(model: Model) {
         var list = mutableListOf<User>()
         list.add(User("userA", 10))
