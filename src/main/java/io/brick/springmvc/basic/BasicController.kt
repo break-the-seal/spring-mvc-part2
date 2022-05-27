@@ -64,6 +64,12 @@ class BasicController {
         return "basic/link"
     }
 
+    @GetMapping("/literal")
+    fun literal(model: Model): String {
+        model.addAttribute("data", "Spring!")
+        return "basic/literal"
+    }
+
     @Component("helloBean")
     class HelloBean {
         fun hello(data: String): String {
