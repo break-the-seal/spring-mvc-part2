@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>예시</h1>
+<span th:text="${data}">html data</span>
+
+<h1>1. 표준 HTML 주석</h1>
+<!--
+<span th:text="${data}">html data</span>
+-->
+
+<h1>2. 타임리프 파서 주석</h1>
+<!--/* [[${data}]] */-->
+
+<!-- 중간에 통으로 html 랜더링 자체가 되지 않음 -->
+<!--/*-->
+<span th:text="${data}">html data</span>
+<!--*/-->
+
+<h1>3. 타임리프 프로토타입 주석</h1>
+<!--
+웹브라우저에서 html 파일로 볼 때 주석으로 되지만
+thymeleaf 랜더링 될 때는 보이게 된다.
+-->
+<!--/*/
+<span th:text="${data}">html data</span>
+/*/-->
+
+</body>
+</html>
