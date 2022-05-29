@@ -33,10 +33,6 @@ class ItemRepository {
             this.itemName = updateParam.itemName
             this.price = updateParam.price
             this.quantity = updateParam.quantity
-            this.open = updateParam.open
-            this.regions = updateParam.regions
-            this.itemType = updateParam.itemType
-            this.deliveryCode = updateParam.deliveryCode
         }
     }
 
