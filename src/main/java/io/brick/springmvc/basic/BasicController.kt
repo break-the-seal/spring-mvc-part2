@@ -106,6 +106,13 @@ class BasicController {
         return "basic/block"
     }
 
+    @GetMapping("/javascript")
+    fun javascript(model: Model): String {
+        model.addAttribute("user", User("userA", 10))
+        addUsers(model)
+        return "basic/javascript"
+    }
+
     private fun addUsers(model: Model) {
         var list = mutableListOf<User>()
         list.add(User("userA", 10))
