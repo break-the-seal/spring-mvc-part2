@@ -1,4 +1,1 @@
-# default: messages
-spring:
-  messages:
-    basename: messages # , config.i18n.messages
+#logging.level.org.apache.coyote.http11=debug
