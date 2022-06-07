@@ -68,9 +68,9 @@ class ValidationItemControllerV1(
             return "validation/v1/addForm"
         }
 
-        val (id) = itemRepository.save(item)
+        val savedItem = itemRepository.save(item)
 
-        redirectAttributes.addAttribute("itemId", id)
+        redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
         return "redirect:/validation/v1/items/{itemId}"
     }

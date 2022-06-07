@@ -106,3 +106,22 @@ val messageCodes = codesResolver.resolveMessageCodes("required", "item", "itemNa
 (개발에 있어서 범용적으로 개발하고 구체적인 부분은 따로 개발하도록 편의성 제공. 비즈니스 코드는 변경을 하지 않아도 에러 코드, 메시지에 대한 수정만 적용 가능)
 
 ### 오류 코드와 메시지 처리 6
+- Integer field에 String 입력시 `typeMismatch` codes를 자동으로 지정해준다.
+- 여기서 중요한 것은 kotlin data class 사용해서 주생성자에 필드를 지정한 순간 kotlin default constructor가 작동을 안한다.  
+  (왜 그런지는 이유 찾아봐야 할듯)
+- class 사용해서 default constructor만 지정해둬야 한다.
+```
+typeMismatch.item.price
+typeMismatch.price
+typeMismatch.java.lang.Integer
+typeMismatch
+```
+
+### Validator 분리1
+- Validator 인터페이스 구현을 통해 bindingResult 검증하는 부분을 따로 분리할 수 있다.
+```java
+public interface Validator {
+  boolean supports(Class<?> clazz);
+  void validate(Object target, Errors errors);
+}
+```

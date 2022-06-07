@@ -15,7 +15,11 @@ internal class ItemRepositoryTest {
     @Test
     fun save() {
         // given
-        val item = Item(itemName = "itemA", price = 10000, quantity = 10)
+        val item = Item().apply {
+            itemName = "itemA"
+            price = 10_000
+            quantity = 10
+        }
 
         // when
         val savedItem = itemRepository.save(item)
@@ -28,8 +32,16 @@ internal class ItemRepositoryTest {
     @Test
     fun findAll() {
         // given
-        val item1 = Item(itemName = "item1", price = 10000, quantity = 10)
-        val item2 = Item(itemName = "item2", price = 20000, quantity = 20)
+        val item1 = Item().apply {
+            itemName = "item1"
+            price = 10_000
+            quantity = 10
+        }
+        val item2 = Item().apply {
+            itemName = "item2"
+            price = 20_000
+            quantity = 20
+        }
 
         itemRepository.save(item1)
         itemRepository.save(item2)
@@ -46,13 +58,21 @@ internal class ItemRepositoryTest {
     @Test
     fun updateItem() {
         // given
-        val item = Item(itemName = "item1", price = 10000, quantity = 10)
+        val item = Item().apply {
+            itemName = "item1"
+            price = 10_000
+            quantity = 10
+        }
 
         val savedItem = itemRepository.save(item)
         val itemId = savedItem.id
 
         // when
-        val updateParam = Item(itemName = "item2", price = 20000, quantity = 20)
+        val updateParam = Item().apply {
+            itemName = "item2"
+            price = 20_000
+            quantity = 20
+        }
         itemRepository.update(itemId, updateParam)
 
         // then

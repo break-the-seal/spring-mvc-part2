@@ -14,7 +14,16 @@ class TestDataInit(
      */
     @PostConstruct
     fun init() {
-        itemRepository.save(Item(itemName = "itemA", price = 10000, quantity = 10))
-        itemRepository.save(Item(itemName = "itemB", price = 20000, quantity = 20))
+        itemRepository.save(Item().apply {
+            itemName = "itemA"
+            price = 10_000
+            quantity = 10
+        })
+
+        itemRepository.save(Item().apply {
+            itemName =  "itemB"
+            price = 20_000
+            quantity = 20
+        })
     }
 }

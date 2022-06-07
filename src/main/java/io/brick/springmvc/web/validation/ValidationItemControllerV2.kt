@@ -15,7 +15,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes
 @Controller
 @RequestMapping("/validation/v2/items")
 class ValidationItemControllerV2(
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val itemValidator: ItemValidator
 ) {
     companion object : KLogging()
 
@@ -77,9 +78,9 @@ class ValidationItemControllerV2(
             return "validation/v2/addForm"
         }
 
-        val (id) = itemRepository.save(item)
+        val savedItem = itemRepository.save(item)
 
-        redirectAttributes.addAttribute("itemId", id)
+        redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
         return "redirect:/validation/v2/items/{itemId}"
     }
@@ -149,9 +150,9 @@ class ValidationItemControllerV2(
             return "validation/v2/addForm"
         }
 
-        val (id) = itemRepository.save(item)
+        val savedItem = itemRepository.save(item)
 
-        redirectAttributes.addAttribute("itemId", id)
+        redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
         return "redirect:/validation/v2/items/{itemId}"
     }
@@ -223,26 +224,27 @@ class ValidationItemControllerV2(
             return "validation/v2/addForm"
         }
 
-        val (id) = itemRepository.save(item)
+        val savedItem = itemRepository.save(item)
 
-        redirectAttributes.addAttribute("itemId", id)
+        redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
         return "redirect:/validation/v2/items/{itemId}"
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     fun addItemV4(
         @ModelAttribute item: Item,
         bindingResult: BindingResult,
         redirectAttributes: RedirectAttributes,
         model: Model
     ): String {
+        logger.info { "objectName = ${bindingResult.objectName}" }
+        logger.info { "target = ${bindingResult.target}" }
+
         ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required")
-        /*
-        if (item.itemName.isNullOrBlank()) {
-            bindingResult.rejectValue("itemName", "required")
-        }
-        */
+//        if (item.itemName.isNullOrBlank()) {
+//            bindingResult.rejectValue("itemName", "required")
+//        }
         if (item.price == null || item.price!! < 1_000 || item.price!! > 1_000_000) {
             bindingResult.rejectValue("price", "range", arrayOf(1_000, 1_000_000), null)
         }
@@ -262,9 +264,30 @@ class ValidationItemControllerV2(
             return "validation/v2/addForm"
         }
 
-        val (id) = itemRepository.save(item)
+        val savedItem = itemRepository.save(item)
 
-        redirectAttributes.addAttribute("itemId", id)
+        redirectAttributes.addAttribute("itemId", savedItem.id)
+        redirectAttributes.addAttribute("status", true)
+        return "redirect:/validation/v2/items/{itemId}"
+    }
+
+    @PostMapping("/add")
+    fun addItemV5(
+        @ModelAttribute item: Item,
+        bindingResult: BindingResult,
+        redirectAttributes: RedirectAttributes,
+        model: Model
+    ): String {
+        itemValidator.validate(item, bindingResult)
+
+        if (bindingResult.hasErrors()) {
+            logger.info { "errors: ${bindingResult}" }
+            return "validation/v2/addForm"
+        }
+
+        val savedItem = itemRepository.save(item)
+
+        redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
         return "redirect:/validation/v2/items/{itemId}"
     }
