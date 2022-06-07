@@ -173,7 +173,7 @@ class ValidationItemControllerV2(
         return "redirect:/validation/v2/items/{itemId}"
     }
 
-    @PostMapping("/add")
+//    @PostMapping("/add")
     fun addItemV3(
         @ModelAttribute item: Item,
         bindingResult: BindingResult,
@@ -199,6 +199,56 @@ class ValidationItemControllerV2(
             val resultPrice = item.price!! * item.quantity!!
             if (resultPrice < 10_000) {
                 bindingResult.addError(ObjectError("item", arrayOf("totalPriceMin"), arrayOf(10_000, resultPrice), "가격 * 수량은 10,000원 이상이어야 합니다. (현재 값 = ${resultPrice})"))
+            }
+        }
+
+        // 검증에 실패하면 입력 폼으로 리다이렉트
+        // bindingResult는 view에 값을 넘길 수 있음
+        if (bindingResult.hasErrors()) {
+            logger.info { "errors: $bindingResult" }
+            return "validation/v2/addForm"
+        }
+
+        // 검증 성공 로직
+        val savedItem: Item = itemRepository.save(item)
+
+        redirectAttributes.addAttribute("itemId", savedItem.id)
+        redirectAttributes.addAttribute("status", true)
+
+        return "redirect:/validation/v2/items/{itemId}"
+    }
+
+    /**
+     * bindingResult.rejectValue
+     *  - bindingResult 에서 이미 item 이라는 ObjectName 을 알고있기 때문에, 아래 규칙을 통해 errors.properties 에 접근 가능
+     *    ex) {errorCode}.{objectName}.{field} -> required.item.itemName
+     */
+    @PostMapping("/add")
+    fun addItemV4(
+        @ModelAttribute item: Item,
+        bindingResult: BindingResult,
+        redirectAttributes: RedirectAttributes,
+        model: Model
+    ): String {
+
+        // 검증 로직
+        if(!StringUtils.hasText(item.itemName)) {
+            bindingResult.rejectValue("itemName", "required")
+        }
+
+        if(item.price == null || item.price!! < 1_000 || item.price!! > 1_000_000) {
+            bindingResult.rejectValue("price", "range", arrayOf(1_000, 1_000_000), null)
+        }
+
+        if (item.quantity == null || item.quantity!! > 9_999) {
+            bindingResult.rejectValue("quantity", "max", arrayOf(9_999), null)
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if (item.price != null && item.quantity != null) {
+            val resultPrice = item.price!! * item.quantity!!
+            if (resultPrice < 10_000) {
+                bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
             }
         }
 
