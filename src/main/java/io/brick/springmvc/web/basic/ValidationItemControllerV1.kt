@@ -113,7 +113,8 @@ class ValidationItemControllerV1(
         redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
 
-        return "redirect:/validation/v1/items/{itemId}"    }
+        return "redirect:/validation/v1/items/{itemId}"
+    }
 
     @GetMapping("/{itemId}/edit")
     fun editForm(@PathVariable itemId: Long, model: Model): String {
