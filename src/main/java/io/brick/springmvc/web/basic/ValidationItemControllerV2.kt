@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils
 import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
+import org.springframework.validation.ValidationUtils
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
@@ -232,9 +233,10 @@ class ValidationItemControllerV2(
     ): String {
 
         // 검증 로직
-        if(!StringUtils.hasText(item.itemName)) {
-            bindingResult.rejectValue("itemName", "required")
-        }
+        ValidationUtils.rejectIfEmptyOrWhitespace(bindingResult, "itemName", "required")
+//        if(!StringUtils.hasText(item.itemName)) {
+//            bindingResult.rejectValue("itemName", "required")
+//        }
 
         if(item.price == null || item.price!! < 1_000 || item.price!! > 1_000_000) {
             bindingResult.rejectValue("price", "range", arrayOf(1_000, 1_000_000), null)
