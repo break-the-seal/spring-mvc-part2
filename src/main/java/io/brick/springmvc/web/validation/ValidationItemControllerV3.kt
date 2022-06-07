@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
-@RequestMapping("/validation/v2/items")
-class ValidationItemControllerV2(
+@RequestMapping("/validation/v3/items")
+class ValidationItemControllerV3(
     private val itemRepository: ItemRepository,
     private val itemValidator: ItemValidator
 ) {
@@ -31,7 +31,7 @@ class ValidationItemControllerV2(
     fun items(model: Model): String {
         val items: List<Item> = itemRepository.findAll()
         model.addAttribute("items", items)
-        return "validation/v2/items"
+        return "validation/v3/items"
     }
 
     @GetMapping("/{itemId}")
@@ -40,13 +40,13 @@ class ValidationItemControllerV2(
             ?: throw RuntimeException("item[${itemId}] NOT FOUND")
 
         model.addAttribute("item", item)
-        return "validation/v2/item"
+        return "validation/v3/item"
     }
 
     @GetMapping("/add")
     fun addForm(model: Model): String {
         model.addAttribute("item", Item())
-        return "validation/v2/addForm"
+        return "validation/v3/addForm"
     }
 
     //    @PostMapping("/add")
@@ -82,14 +82,14 @@ class ValidationItemControllerV2(
 
         if (bindingResult.hasErrors()) {
             logger.info { "errors: ${bindingResult}" }
-            return "validation/v2/addForm"
+            return "validation/v3/addForm"
         }
 
         val savedItem = itemRepository.save(item)
 
         redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
-        return "redirect:/validation/v2/items/{itemId}"
+        return "redirect:/validation/v3/items/{itemId}"
     }
 
 //    @PostMapping("/add")
@@ -154,14 +154,14 @@ class ValidationItemControllerV2(
 
         if (bindingResult.hasErrors()) {
             logger.info { "errors: ${bindingResult}" }
-            return "validation/v2/addForm"
+            return "validation/v3/addForm"
         }
 
         val savedItem = itemRepository.save(item)
 
         redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
-        return "redirect:/validation/v2/items/{itemId}"
+        return "redirect:/validation/v3/items/{itemId}"
     }
 
 //    @PostMapping("/add")
@@ -228,14 +228,14 @@ class ValidationItemControllerV2(
 
         if (bindingResult.hasErrors()) {
             logger.info { "errors: ${bindingResult}" }
-            return "validation/v2/addForm"
+            return "validation/v3/addForm"
         }
 
         val savedItem = itemRepository.save(item)
 
         redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
-        return "redirect:/validation/v2/items/{itemId}"
+        return "redirect:/validation/v3/items/{itemId}"
     }
 
 //    @PostMapping("/add")
@@ -268,14 +268,14 @@ class ValidationItemControllerV2(
 
         if (bindingResult.hasErrors()) {
             logger.info { "errors: ${bindingResult}" }
-            return "validation/v2/addForm"
+            return "validation/v3/addForm"
         }
 
         val savedItem = itemRepository.save(item)
 
         redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
-        return "redirect:/validation/v2/items/{itemId}"
+        return "redirect:/validation/v3/items/{itemId}"
     }
 
 //    @PostMapping("/add")
@@ -289,14 +289,14 @@ class ValidationItemControllerV2(
 
         if (bindingResult.hasErrors()) {
             logger.info { "errors: ${bindingResult}" }
-            return "validation/v2/addForm"
+            return "validation/v3/addForm"
         }
 
         val savedItem = itemRepository.save(item)
 
         redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
-        return "redirect:/validation/v2/items/{itemId}"
+        return "redirect:/validation/v3/items/{itemId}"
     }
 
     @PostMapping("/add")
@@ -308,14 +308,14 @@ class ValidationItemControllerV2(
     ): String {
         if (bindingResult.hasErrors()) {
             logger.info { "errors: ${bindingResult}" }
-            return "validation/v2/addForm"
+            return "validation/v3/addForm"
         }
 
         val savedItem = itemRepository.save(item)
 
         redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
-        return "redirect:/validation/v2/items/{itemId}"
+        return "redirect:/validation/v3/items/{itemId}"
     }
 
     @GetMapping("/{itemId}/edit")
@@ -324,12 +324,12 @@ class ValidationItemControllerV2(
             ?: throw RuntimeException("item[${itemId}] NOT FOUND")
 
         model.addAttribute("item", item)
-        return "validation/v2/editForm"
+        return "validation/v3/editForm"
     }
 
     @PostMapping("/{itemId}/edit")
     fun edit(@PathVariable itemId: Long, @ModelAttribute item: Item): String {
         itemRepository.update(itemId, item)
-        return "redirect:/validation/v2/items/{itemId}"
+        return "redirect:/validation/v3/items/{itemId}"
     }
 }

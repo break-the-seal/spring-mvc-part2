@@ -105,7 +105,7 @@ val messageCodes = codesResolver.resolveMessageCodes("required", "item", "itemNa
 - 우선순위는 구체적(최우선) -> 범용적  
 (개발에 있어서 범용적으로 개발하고 구체적인 부분은 따로 개발하도록 편의성 제공. 비즈니스 코드는 변경을 하지 않아도 에러 코드, 메시지에 대한 수정만 적용 가능)
 
-### 오류 코드와 메시지 처리 6
+### 오류 코드와 메시지 처리 6 (스프링이 직접 만든 error)
 - Integer field에 String 입력시 `typeMismatch` codes를 자동으로 지정해준다.
 - 여기서 중요한 것은 kotlin data class 사용해서 주생성자에 필드를 지정한 순간 kotlin default constructor가 작동을 안한다.  
   (왜 그런지는 이유 찾아봐야 할듯)
@@ -117,11 +117,62 @@ typeMismatch.java.lang.Integer
 typeMismatch
 ```
 
-### Validator 분리1
+### Validator 분리 1
 - Validator 인터페이스 구현을 통해 bindingResult 검증하는 부분을 따로 분리할 수 있다.
 ```java
 public interface Validator {
   boolean supports(Class<?> clazz);
   void validate(Object target, Errors errors);
 }
+```
+
+### Validator 분리 2
+- 직접 생성자 생성을 하지 않고 Validator 인터페이스를 제공하는 이유는 스프링에서 체계적인 검증 기능 도입하기 위함
+- `WebDataBinder`를 통해 검증 기능을 포함시킬 수 있음
+```kotlin
+@InitBinder
+fun init(dataBinder: WebDataBinder) {
+    dataBinder.addValidators(itemValidator)
+}
+
+fun addItemV6(
+@Validated @ModelAttribute item: Item,
+// ...
+)
+```
+- **요청 때마다** initBinder가 항상 불려져서 검증기를 dataBinder에 넣어둔다.
+- 해당 binding 되는 부분에 `@Validated` 적용
+  - 검증기를 실행하라는 어노테이션
+```kotlin
+// config file
+class AppConfig: WebMvcConfigurer {
+  override fun getValidator() {
+      return ItemValidator()
+  }
+}
+```
+- global validator 적용 (모든 controller에서 해당 지정한 validator를 추가)
+- 참고
+  - `@Validated`: 스프링 검증 애노테이션
+  - `@Valid`: 자바 표준 검증 애노테이션(`javax`, `spring-boot-starter-validation`)
+
+## Section 5. Bean Validation
+
+### Bean Validation
+- **Bean Validation 2.0(JSR-380)** 기술 표준
+- 애노테이션과 여러 인터페이스의 모음(like JPA 표준기술 - hibernate)
+- Bean Validation - Hibernate Validation 구현체 사용(ORM 관련 X)
+```groovy
+implementation 'org.springframework.boot:spring-boot-starter-validation'
+```
+- `jakarta validation` 기술 제공(인터페이스) - `hibernate validator`(구현체)
+### Bean Validation 시작
+- Validation Annotation
+  - `javax.validation` 시작하는 것들은 특정 구현에 상관없이 제공되는 표준 인터페이스
+  - `org.hibernate.validator` 시작하는 것들은 하이버네이트 validator 구현체를 사용할 때만 제공
+```kotlin
+val factory = Validation.buildDefaultValidatorFactory()
+val validator = factory.validator
+
+val violations: Set<ConstraintViolation<Item>> = validator.validate(item)
 ```

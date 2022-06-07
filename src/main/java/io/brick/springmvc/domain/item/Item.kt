@@ -1,9 +1,22 @@
 package io.brick.springmvc.domain.item
 
+import org.hibernate.validator.constraints.Range
+import javax.validation.constraints.Max
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotNull
+
 class Item {
     var id: Long = 0L
+
+    @field:NotBlank
     var itemName: String? = null
+
+    @field:NotNull
+    @field:Range(min = 1_000, max = 1_000_000)
     var price: Int? = null
+
+    @field:NotNull
+    @field:Max(9_999)
     var quantity: Int? = null
 
     override fun toString(): String {
