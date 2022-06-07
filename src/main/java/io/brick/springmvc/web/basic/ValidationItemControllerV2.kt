@@ -12,15 +12,27 @@ import org.springframework.validation.BindingResult
 import org.springframework.validation.FieldError
 import org.springframework.validation.ObjectError
 import org.springframework.validation.ValidationUtils
+import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.WebDataBinder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
 @RequestMapping("/validation/v2/items")
 class ValidationItemControllerV2(
-    private val itemRepository: ItemRepository
+    private val itemRepository: ItemRepository,
+    private val itemValidator: ItemValidator
 ) {
     companion object : KLogging()
+
+    /**
+     * 컨트롤러가 호출되기 전에 생성
+     */
+    @InitBinder
+    fun init(dataBinder: WebDataBinder) {
+        logger.info("init binder {}", dataBinder)
+        dataBinder.addValidators(itemValidator)
+    }
 
     // 자동으로 model 에 담김
     @ModelAttribute("regions")
@@ -224,7 +236,7 @@ class ValidationItemControllerV2(
      *  - bindingResult 에서 이미 item 이라는 ObjectName 을 알고있기 때문에, 아래 규칙을 통해 errors.properties 에 접근 가능
      *    ex) {errorCode}.{objectName}.{field} -> required.item.itemName
      */
-    @PostMapping("/add")
+//    @PostMapping("/add")
     fun addItemV4(
         @ModelAttribute item: Item,
         bindingResult: BindingResult,
@@ -253,6 +265,60 @@ class ValidationItemControllerV2(
                 bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
             }
         }
+
+        // 검증에 실패하면 입력 폼으로 리다이렉트
+        // bindingResult는 view에 값을 넘길 수 있음
+        if (bindingResult.hasErrors()) {
+            logger.info { "errors: $bindingResult" }
+            return "validation/v2/addForm"
+        }
+
+        // 검증 성공 로직
+        val savedItem: Item = itemRepository.save(item)
+
+        redirectAttributes.addAttribute("itemId", savedItem.id)
+        redirectAttributes.addAttribute("status", true)
+
+        return "redirect:/validation/v2/items/{itemId}"
+    }
+
+//    @PostMapping("/add")
+    fun addItemV5(
+        @ModelAttribute item: Item,
+        bindingResult: BindingResult,
+        redirectAttributes: RedirectAttributes,
+        model: Model
+    ): String {
+
+        // 검증 로직
+        itemValidator.validate(item, bindingResult)
+
+        // 검증에 실패하면 입력 폼으로 리다이렉트
+        // bindingResult는 view에 값을 넘길 수 있음
+        if (bindingResult.hasErrors()) {
+            logger.info { "errors: $bindingResult" }
+            return "validation/v2/addForm"
+        }
+
+        // 검증 성공 로직
+        val savedItem: Item = itemRepository.save(item)
+
+        redirectAttributes.addAttribute("itemId", savedItem.id)
+        redirectAttributes.addAttribute("status", true)
+
+        return "redirect:/validation/v2/items/{itemId}"
+    }
+
+    /**
+     * @Validated 적용
+     */
+    @PostMapping("/add")
+    fun addItemV6(
+        @Validated @ModelAttribute item: Item,
+        bindingResult: BindingResult,
+        redirectAttributes: RedirectAttributes,
+        model: Model
+    ): String {
 
         // 검증에 실패하면 입력 폼으로 리다이렉트
         // bindingResult는 view에 값을 넘길 수 있음
