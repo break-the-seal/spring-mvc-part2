@@ -9,17 +9,19 @@ import javax.validation.constraints.NotNull
 // 권장하지 않음
 //@ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000", message = "총합이 10000원 넘게 입력해주세요.")
 class Item() {
+
+    @NotNull(groups = [UpdateCheck::class])
     var id: Long = 0L
 
-    @NotBlank
+    @NotBlank(groups = [SaveCheck::class, UpdateCheck::class])
     var itemName: String? = null
 
-    @NotNull
-    @Range(min = 1_000, max = 1_000_000)
+    @NotNull(groups = [SaveCheck::class, UpdateCheck::class])
+    @Range(min = 1_000, max = 1_000_000, groups = [SaveCheck::class, UpdateCheck::class])
     var price: Int? = null
 
-    @NotNull
-    @Max(9999)
+    @NotNull(groups = [SaveCheck::class, UpdateCheck::class])
+    @Max(9999, groups = [SaveCheck::class])
     var quantity: Int? = null
 
     var open: Boolean? = null               // 판매 여부

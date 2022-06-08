@@ -1,9 +1,6 @@
 package io.brick.springmvc.web.basic
 
-import io.brick.springmvc.domain.item.DeliveryCode
-import io.brick.springmvc.domain.item.Item
-import io.brick.springmvc.domain.item.ItemRepository
-import io.brick.springmvc.domain.item.ItemType
+import io.brick.springmvc.domain.item.*
 import mu.KLogging
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -71,10 +68,42 @@ class ValidationItemControllerV3(
         return "validation/v3/addForm"
     }
 
-
-    @PostMapping("/add")
+//    @PostMapping("/add")
     fun addItem(
         @Validated @ModelAttribute item: Item,
+        bindingResult: BindingResult,
+        redirectAttributes: RedirectAttributes,
+        model: Model
+    ): String {
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if (item.price != null && item.quantity != null) {
+            val resultPrice = item.price!! * item.quantity!!
+            if (resultPrice < 10_000) {
+                bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
+            }
+        }
+
+        // 검증에 실패하면 입력 폼으로 리다이렉트
+        // bindingResult는 view에 값을 넘길 수 있음
+        if (bindingResult.hasErrors()) {
+            logger.info { "errors: $bindingResult" }
+            return "validation/v3/addForm"
+        }
+
+        // 검증 성공 로직
+        val savedItem: Item = itemRepository.save(item)
+
+        redirectAttributes.addAttribute("itemId", savedItem.id)
+        redirectAttributes.addAttribute("status", true)
+
+        return "redirect:/validation/v3/items/{itemId}"
+    }
+
+    @PostMapping("/add")
+    fun addItemV2(
+        // Item 클래스의 SaveCheck가 적용된 부분만 검사
+        @Validated(value = [SaveCheck::class]) @ModelAttribute item: Item,
         bindingResult: BindingResult,
         redirectAttributes: RedirectAttributes,
         model: Model
@@ -112,10 +141,35 @@ class ValidationItemControllerV3(
         return "validation/v3/editForm"
     }
 
-    @PostMapping("/{itemId}/edit")
+//    @PostMapping("/{itemId}/edit")
     fun edit(
         @PathVariable itemId: Long,
         @Validated @ModelAttribute item: Item,
+        bindingResult: BindingResult
+    ): String {
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if (item.price != null && item.quantity != null) {
+            val resultPrice = item.price!! * item.quantity!!
+            if (resultPrice < 10_000) {
+                bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
+            }
+        }
+
+        if (bindingResult.hasErrors()) {
+            logger.info { "errors: $bindingResult" }
+            return "validation/v3/editForm"
+        }
+
+        itemRepository.update(itemId, item)
+
+        return "redirect:/validation/v3/items/{itemId}"
+    }
+
+    @PostMapping("/{itemId}/edit")
+    fun editV2(
+        @PathVariable itemId: Long,
+        @Validated(value = [UpdateCheck::class]) @ModelAttribute item: Item,
         bindingResult: BindingResult
     ): String {
 
