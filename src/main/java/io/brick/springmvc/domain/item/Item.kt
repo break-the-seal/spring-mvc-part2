@@ -1,9 +1,22 @@
 package io.brick.springmvc.domain.item
 
+import org.hibernate.validator.constraints.Range
+import javax.validation.constraints.Max
+import javax.validation.constraints.NotBlank
+import javax.validation.constraints.NotNull
+
 class Item() {
     var id: Long = 0L
+
+    @NotBlank
     var itemName: String? = null
+
+    @NotNull
+    @Range(min = 1_000, max = 1_000_000)
     var price: Int? = null
+
+    @NotNull
+    @Max(9999)
     var quantity: Int? = null
 
     var open: Boolean? = null               // 판매 여부
