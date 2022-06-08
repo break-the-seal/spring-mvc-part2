@@ -5,7 +5,7 @@
 
 <br>
 
-## Section 4. Validation
+## 📌 Section 4. Validation
 
 ### BindingResult
 - `BindingResult`는 view에 같이 넘어간다. 
@@ -110,7 +110,7 @@ val messageCodes = codesResolver.resolveMessageCodes("required", "item", "itemNa
 - 여기서 중요한 것은 kotlin data class 사용해서 주생성자에 필드를 지정한 순간 kotlin default constructor가 작동을 안한다.  
   (왜 그런지는 이유 찾아봐야 할듯)
 - class 사용해서 default constructor만 지정해둬야 한다.
-```
+```text
 typeMismatch.item.price
 typeMismatch.price
 typeMismatch.java.lang.Integer
@@ -156,7 +156,9 @@ class AppConfig: WebMvcConfigurer {
   - `@Validated`: 스프링 검증 애노테이션
   - `@Valid`: 자바 표준 검증 애노테이션(`javax`, `spring-boot-starter-validation`)
 
-## Section 5. Bean Validation
+<br>
+
+## 📌 Section 5. Bean Validation
 
 ### Bean Validation
 - **Bean Validation 2.0(JSR-380)** 기술 표준
@@ -166,6 +168,7 @@ class AppConfig: WebMvcConfigurer {
 implementation 'org.springframework.boot:spring-boot-starter-validation'
 ```
 - `jakarta validation` 기술 제공(인터페이스) - `hibernate validator`(구현체)
+
 ### Bean Validation 시작
 - Validation Annotation
   - `javax.validation` 시작하는 것들은 특정 구현에 상관없이 제공되는 표준 인터페이스
@@ -176,3 +179,53 @@ val validator = factory.validator
 
 val violations: Set<ConstraintViolation<Item>> = validator.validate(item)
 ```
+
+### Bean Validation - 스프링 적용
+```kotlin
+@field:NotBlank
+@field:NotNull
+@field:Range(min = 1_000, max = 1_000_000)
+```
+- 이러한 어노테이션만으로 Validator 등록 없이 Validation 기능 사용 가능
+- `@Validated`, `@Valid`가 붙어 있어야 한다.
+
+#### 검증 순서(중요)
+- `@ModelAttribute` 각 필드에 타입 변환 시도
+  - 성공하면 다음으로
+  - 실패하면 `typeMismatch` -> `FieldError` 추가
+- Validator 적용
+- (여기서 바인딩에 실패한 필드는 Bean Validation을 적용하지 않는다.)
+- **Kotlin에서 확정형으로 하는 경우 NotNull validation 적용이 안되는 이유**
+> typeMismatch --> Bean Validation 진행 X  
+> typeMismatch X --> Bean Validation 진행
+
+### Bean Validation - 에러 코드
+- MessageCodesResolver가 Bean Validation에 대한 코드를 생성해준다.
+```text
+-> @NotBlank
+NotBlank.item.itemName
+NotBlank.itemName
+NotBlank.java.lang.String
+NotBlank
+```
+
+### Bean Validation - 오브젝트 오류
+```kotlin
+@ScriptAssert(
+  lang = "javascript", 
+  script = "_this.price * _this.quantity >= 10000", 
+  message = "총합이 100000원 이상 입력해주세요."
+)
+class Item {
+    //...
+}
+```
+- Script 표현식을 통해 ObjectError를 만들 수 있음
+```text
+ScriptAssert.item
+ScriptAssert
+```
+- 하지만 실무에서는 비추천(해당 객체 범위를 넘어서는 경우도 존재, 사용하기 복잡)
+- **직접 Controller 단 코드에 적용하는 것을 추천**
+
+### Bean Validation - 수정에 적용
