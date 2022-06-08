@@ -80,6 +80,14 @@ class ValidationItemControllerV3(
         model: Model
     ): String {
 
+        // 특정 필드가 아닌 복합 룰 검증
+        if (item.price != null && item.quantity != null) {
+            val resultPrice = item.price!! * item.quantity!!
+            if (resultPrice < 10_000) {
+                bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
+            }
+        }
+
         // 검증에 실패하면 입력 폼으로 리다이렉트
         // bindingResult는 view에 값을 넘길 수 있음
         if (bindingResult.hasErrors()) {

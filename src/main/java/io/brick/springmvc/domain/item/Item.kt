@@ -1,10 +1,13 @@
 package io.brick.springmvc.domain.item
 
 import org.hibernate.validator.constraints.Range
+import org.hibernate.validator.constraints.ScriptAssert
 import javax.validation.constraints.Max
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.NotNull
 
+// 권장하지 않음
+//@ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000", message = "총합이 10000원 넘게 입력해주세요.")
 class Item() {
     var id: Long = 0L
 
