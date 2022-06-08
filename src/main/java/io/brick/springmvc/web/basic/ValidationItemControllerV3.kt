@@ -113,7 +113,25 @@ class ValidationItemControllerV3(
     }
 
     @PostMapping("/{itemId}/edit")
-    fun edit(@PathVariable itemId: Long, @ModelAttribute item: Item): String {
+    fun edit(
+        @PathVariable itemId: Long,
+        @Validated @ModelAttribute item: Item,
+        bindingResult: BindingResult
+    ): String {
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if (item.price != null && item.quantity != null) {
+            val resultPrice = item.price!! * item.quantity!!
+            if (resultPrice < 10_000) {
+                bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
+            }
+        }
+
+        if (bindingResult.hasErrors()) {
+            logger.info { "errors: $bindingResult" }
+            return "validation/v3/editForm"
+        }
+
         itemRepository.update(itemId, item)
 
         return "redirect:/validation/v3/items/{itemId}"
