@@ -264,3 +264,30 @@ var id: Long = 0L
   - form 형식 - `ItemSaveForm`
   - api 형식 - `ItemSaveRequest`
   - 혹은 dto 이름 - `ItemSaveDto`
+
+### Bean Validation - HTTP 메시지 컨버터
+- `@RequestBody`에 대해서 실패 요청(binding 오류 등)하면 아예 JSON -> 객체 생성 자체가 실패
+- 실패 요청에 대해서 아예 컨트롤러 핸들러도 실행되지 않는다. (JSON -> 객체로 아예 만들지 못했기 때문)
+
+#### 3가지 경우
+- 성공 요청
+- 실패 요청: JSON -> 객체 생성하는 것 자체 실패(Controller 핸들러 실행 X)
+- 검증 오류 요청: JSON -> 객체 생성 성공, 검증에서 실패 
+
+#### errors
+```kotlin
+// ObjectError + FieldError
+bindingResult.allErrors
+```
+
+#### @ModelAttribute vs @RequestBody
+- @ModelAttribute
+  - 필드 단위로 세밀하게 적용
+  - 특정 필드가 typeMismatch 발생해도 나머지 필드는 Bean Validation 과정 거친다.
+  - 특정 필드에서 타입 오류가 발생해도 해당 ModelAttribute 객체는 생성되고 컨트롤러 핸들러도 동작한다.
+- @RequestBody
+  - 전체 객체 단위로 적용 (필드 단위 X)
+  - 특정 필드에서 타입 오류가 발생하면 객체 자체가 생성이 안된다.
+  - 모든 필드에서 binding이 잘 이루어지고 JSON -> 객체 생성이 이루어지면 이후에 validation 작업을 진행한다.
+
+> JSON, parameter 요청 -> binding 작업 -> 객체 생성 -> 검증 작업 진행

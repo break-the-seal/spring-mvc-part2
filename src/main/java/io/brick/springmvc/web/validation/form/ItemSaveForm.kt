@@ -10,10 +10,10 @@ data class ItemSaveForm(
     var itemName: String? = null,
 
     @field:NotNull
-    @Range(min = 1_000, max = 1_000_000)
+    @field:Range(min = 1_000, max = 1_000_000)
     var price: Int? = null,
 
     @field:NotNull
-    @Max(9_999)
+    @field:Max(9_999)
     var quantity: Int? = null
 )
