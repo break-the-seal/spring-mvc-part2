@@ -257,3 +257,10 @@ var id: Long = 0L
 ```
 - 위 방식으로 save, update 상황 따로따로 Bean Validation을 적용할 수 있다.
 - 하지만 이러한 방식은 개발하기 까다롭고 복잡해보임 (Dto 분리를 하는 것이 깔끔)
+
+### Form 전송 객체 분리
+- 실무에서는 등록과 수정에서의 전달하는 데이터 형식이 많이 다르다. (groups를 적용할 수 없는 이유)
+- 전달 Dto 이름은 상황에 따라 유연하게 정할 수 있음
+  - form 형식 - `ItemSaveForm`
+  - api 형식 - `ItemSaveRequest`
+  - 혹은 dto 이름 - `ItemSaveDto`

@@ -2,8 +2,8 @@ package io.brick.springmvc.web.validation
 
 import io.brick.springmvc.domain.item.Item
 import io.brick.springmvc.domain.item.ItemRepository
-import io.brick.springmvc.domain.item.SaveCheck
-import io.brick.springmvc.domain.item.UpdateCheck
+import io.brick.springmvc.web.validation.form.ItemSaveForm
+import io.brick.springmvc.web.validation.form.ItemUpdateForm
 import mu.KLogging
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -41,41 +41,16 @@ class ValidationItemControllerV4(
         return "validation/v4/addForm"
     }
 
-//    @PostMapping("/add")
-    fun addItem(
-        @Validated @ModelAttribute item: Item,
-        bindingResult: BindingResult,
-        redirectAttributes: RedirectAttributes
-    ): String {
-        // 오브젝트 에러에 대해서는 직접 코드로 구현하는 것이 좋다.
-        if (item.price != null && item.quantity != null) {
-            val resultPrice = item.price!! * item.quantity!!
-            if (resultPrice < 10_000) {
-                bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
-            }
-        }
-
-        if (bindingResult.hasErrors()) {
-            logger.info { "errors: ${bindingResult}" }
-            return "validation/v4/addForm"
-        }
-
-        val savedItem = itemRepository.save(item)
-
-        redirectAttributes.addAttribute("itemId", savedItem.id)
-        redirectAttributes.addAttribute("status", true)
-        return "redirect:/validation/v4/items/{itemId}"
-    }
-
+    // ModelAttribute <- item 지정을 해야 한다.
     @PostMapping("/add")
     fun addItem2(
-        @Validated(SaveCheck::class) @ModelAttribute item: Item,
+        @Validated @ModelAttribute("item") form: ItemSaveForm,
         bindingResult: BindingResult,
         redirectAttributes: RedirectAttributes
     ): String {
         // 오브젝트 에러에 대해서는 직접 코드로 구현하는 것이 좋다.
-        if (item.price != null && item.quantity != null) {
-            val resultPrice = item.price!! * item.quantity!!
+        if (form.price != null && form.quantity != null) {
+            val resultPrice = form.price!! * form.quantity!!
             if (resultPrice < 10_000) {
                 bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
             }
@@ -86,7 +61,12 @@ class ValidationItemControllerV4(
             return "validation/v4/addForm"
         }
 
-        val savedItem = itemRepository.save(item)
+        val itemParam = Item().apply {
+            itemName = form.itemName
+            price = form.price
+            quantity = form.quantity
+        }
+        val savedItem = itemRepository.save(itemParam)
 
         redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
@@ -105,11 +85,11 @@ class ValidationItemControllerV4(
     @PostMapping("/{itemId}/edit")
     fun edit(
         @PathVariable itemId: Long,
-        @Validated(UpdateCheck::class) @ModelAttribute item: Item,
+        @Validated @ModelAttribute("item") form: ItemUpdateForm,
         bindingResult: BindingResult
     ): String {
-        if (item.price != null && item.quantity != null) {
-            val resultPrice = item.price!! * item.quantity!!
+        if (form.price != null && form.quantity != null) {
+            val resultPrice = form.price!! * form.quantity!!
             if (resultPrice < 10_000) {
                 bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
             }
@@ -120,7 +100,12 @@ class ValidationItemControllerV4(
             return "validation/v4/editForm"
         }
 
-        itemRepository.update(itemId, item)
+        val itemParam = Item().apply {
+            itemName = form.itemName
+            price = form.price
+            quantity = form.quantity
+        }
+        itemRepository.update(itemId, itemParam)
         return "redirect:/validation/v4/items/{itemId}"
     }
 }
