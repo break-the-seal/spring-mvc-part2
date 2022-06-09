@@ -53,8 +53,7 @@ class ValidationItemControllerV2(
     fun addItemV1(
         @ModelAttribute item: Item,
         bindingResult: BindingResult,
-        redirectAttributes: RedirectAttributes,
-        model: Model
+        redirectAttributes: RedirectAttributes
     ): String {
         if (item.itemName.isNullOrBlank()) {
             bindingResult.addError(
@@ -96,8 +95,7 @@ class ValidationItemControllerV2(
     fun addItemV2(
         @ModelAttribute item: Item,
         bindingResult: BindingResult,
-        redirectAttributes: RedirectAttributes,
-        model: Model
+        redirectAttributes: RedirectAttributes
     ): String {
         if (item.itemName.isNullOrBlank()) {
             bindingResult.addError(
@@ -168,8 +166,7 @@ class ValidationItemControllerV2(
     fun addItemV3(
         @ModelAttribute item: Item,
         bindingResult: BindingResult,
-        redirectAttributes: RedirectAttributes,
-        model: Model
+        redirectAttributes: RedirectAttributes
     ): String {
         if (item.itemName.isNullOrBlank()) {
             bindingResult.addError(
@@ -242,8 +239,7 @@ class ValidationItemControllerV2(
     fun addItemV4(
         @ModelAttribute item: Item,
         bindingResult: BindingResult,
-        redirectAttributes: RedirectAttributes,
-        model: Model
+        redirectAttributes: RedirectAttributes
     ): String {
         logger.info { "objectName = ${bindingResult.objectName}" }
         logger.info { "target = ${bindingResult.target}" }
@@ -282,8 +278,7 @@ class ValidationItemControllerV2(
     fun addItemV5(
         @ModelAttribute item: Item,
         bindingResult: BindingResult,
-        redirectAttributes: RedirectAttributes,
-        model: Model
+        redirectAttributes: RedirectAttributes
     ): String {
         itemValidator.validate(item, bindingResult)
 
@@ -303,8 +298,7 @@ class ValidationItemControllerV2(
     fun addItemV6(
         @Validated @ModelAttribute item: Item,
         bindingResult: BindingResult,
-        redirectAttributes: RedirectAttributes,
-        model: Model
+        redirectAttributes: RedirectAttributes
     ): String {
         if (bindingResult.hasErrors()) {
             logger.info { "errors: ${bindingResult}" }

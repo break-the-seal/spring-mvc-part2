@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
-@RequestMapping("/validation/v3/items")
-class ValidationItemControllerV3(
+@RequestMapping("/validation/v4/items")
+class ValidationItemControllerV4(
     private val itemRepository: ItemRepository
 ) {
     companion object : KLogging()
@@ -23,7 +23,7 @@ class ValidationItemControllerV3(
     fun items(model: Model): String {
         val items: List<Item> = itemRepository.findAll()
         model.addAttribute("items", items)
-        return "validation/v3/items"
+        return "validation/v4/items"
     }
 
     @GetMapping("/{itemId}")
@@ -32,13 +32,13 @@ class ValidationItemControllerV3(
             ?: throw RuntimeException("item[${itemId}] NOT FOUND")
 
         model.addAttribute("item", item)
-        return "validation/v3/item"
+        return "validation/v4/item"
     }
 
     @GetMapping("/add")
     fun addForm(model: Model): String {
         model.addAttribute("item", Item())
-        return "validation/v3/addForm"
+        return "validation/v4/addForm"
     }
 
 //    @PostMapping("/add")
@@ -57,14 +57,14 @@ class ValidationItemControllerV3(
 
         if (bindingResult.hasErrors()) {
             logger.info { "errors: ${bindingResult}" }
-            return "validation/v3/addForm"
+            return "validation/v4/addForm"
         }
 
         val savedItem = itemRepository.save(item)
 
         redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
-        return "redirect:/validation/v3/items/{itemId}"
+        return "redirect:/validation/v4/items/{itemId}"
     }
 
     @PostMapping("/add")
@@ -83,14 +83,14 @@ class ValidationItemControllerV3(
 
         if (bindingResult.hasErrors()) {
             logger.info { "errors: ${bindingResult}" }
-            return "validation/v3/addForm"
+            return "validation/v4/addForm"
         }
 
         val savedItem = itemRepository.save(item)
 
         redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
-        return "redirect:/validation/v3/items/{itemId}"
+        return "redirect:/validation/v4/items/{itemId}"
     }
 
     @GetMapping("/{itemId}/edit")
@@ -99,7 +99,7 @@ class ValidationItemControllerV3(
             ?: throw RuntimeException("item[${itemId}] NOT FOUND")
 
         model.addAttribute("item", item)
-        return "validation/v3/editForm"
+        return "validation/v4/editForm"
     }
 
     @PostMapping("/{itemId}/edit")
@@ -117,10 +117,10 @@ class ValidationItemControllerV3(
 
         if (bindingResult.hasErrors()) {
             logger.info { "errors: ${bindingResult}" }
-            return "validation/v3/editForm"
+            return "validation/v4/editForm"
         }
 
         itemRepository.update(itemId, item)
-        return "redirect:/validation/v3/items/{itemId}"
+        return "redirect:/validation/v4/items/{itemId}"
     }
 }

@@ -228,4 +228,32 @@ ScriptAssert
 - 하지만 실무에서는 비추천(해당 객체 범위를 넘어서는 경우도 존재, 사용하기 복잡)
 - **직접 Controller 단 코드에 적용하는 것을 추천**
 
-### Bean Validation - 수정에 적용
+### Bean Validation - 한계
+- 수정시 id not null 조건 & quantity 무제한으로 요건 변경
+```kotlin
+@NotNull // 수정 요구사항 추가
+var id: Long = 0L
+
+@NotNull
+// @Max(9_999) // 수정 요구사항 추가
+var quantity: Int? = null
+```
+- 이런 경우 생성시에 문제 발생(id 값이 생성전이라 없음, 생성 때는 quantity max 제한 불가)
+
+### Bean Validation - groups
+- 바로 위의 상황을 해결하는 두 가지 방법
+  - Bean Validation groups 적용
+  - Dto를 생성, 수정시 분리(ItemSaveForm, ItemUpdateForm)
+
+#### groups 적용
+
+```kotlin
+// Item
+@NotNull(groups = [UpdateCheck::class]) // 수정 요구사항 추가
+var id: Long = 0L
+
+// Controller
+@Validated(UpdateCheck::class) @ModelAttribute item: Item
+```
+- 위 방식으로 save, update 상황 따로따로 Bean Validation을 적용할 수 있다.
+- 하지만 이러한 방식은 개발하기 까다롭고 복잡해보임 (Dto 분리를 하는 것이 깔끔)

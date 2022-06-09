@@ -7,10 +7,11 @@ import javax.validation.constraints.NotNull
 
 //@ScriptAssert(lang = "javascript", script = "_this.price * _this.quantity >= 10000", message = "총합이 100000원 이상 입력해주세요.")
 class Item {
+    @NotNull(groups = [UpdateCheck::class]) // 수정 요구사항 추가
     var id: Long = 0L
 
     // @field: 안써도 됨
-    @NotBlank
+    @NotBlank(groups = [SaveCheck::class, UpdateCheck::class])
     var itemName: String? = null
 
 //    Validation {
@@ -18,12 +19,12 @@ class Item {
 //        2. Bean Validation (@ 기법)
 //    }
 
-    @NotNull
-    @Range(min = 1_000, max = 1_000_000)
+    @NotNull(groups = [SaveCheck::class, UpdateCheck::class])
+    @Range(min = 1_000, max = 1_000_000, groups = [SaveCheck::class, UpdateCheck::class])
     var price: Int? = null
 
-    @NotNull
-    @Max(9_999)
+    @NotNull(groups = [SaveCheck::class, UpdateCheck::class])
+    @Max(9_999, groups = [SaveCheck::class]) // 수정 요구사항 추가
     var quantity: Int? = null
 
     override fun toString(): String {
