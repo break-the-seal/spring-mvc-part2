@@ -1,9 +1,9 @@
-package io.brick.springmvc.web.validation
+package io.brick.springmvc.web.item
 
 import io.brick.springmvc.domain.item.Item
 import io.brick.springmvc.domain.item.ItemRepository
-import io.brick.springmvc.domain.item.SaveCheck
-import io.brick.springmvc.domain.item.UpdateCheck
+import io.brick.springmvc.web.item.form.ItemSaveForm
+import io.brick.springmvc.web.item.form.ItemUpdateForm
 import mu.KLogging
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.servlet.mvc.support.RedirectAttributes
 
 @Controller
-@RequestMapping("/validation/v3/items")
-class ValidationItemControllerV3(
+@RequestMapping("/items")
+class ItemController(
     private val itemRepository: ItemRepository
 ) {
     companion object : KLogging()
@@ -23,7 +23,7 @@ class ValidationItemControllerV3(
     fun items(model: Model): String {
         val items: List<Item> = itemRepository.findAll()
         model.addAttribute("items", items)
-        return "validation/v3/items"
+        return "items/items"
     }
 
     @GetMapping("/{itemId}")
@@ -32,50 +32,25 @@ class ValidationItemControllerV3(
             ?: throw RuntimeException("item[${itemId}] NOT FOUND")
 
         model.addAttribute("item", item)
-        return "validation/v3/item"
+        return "items/item"
     }
 
     @GetMapping("/add")
     fun addForm(model: Model): String {
         model.addAttribute("item", Item())
-        return "validation/v3/addForm"
+        return "items/addForm"
     }
 
-//    @PostMapping("/add")
-    fun addItem(
-        @Validated @ModelAttribute item: Item,
-        bindingResult: BindingResult,
-        redirectAttributes: RedirectAttributes
-    ): String {
-        // 오브젝트 에러에 대해서는 직접 코드로 구현하는 것이 좋다.
-        if (item.price != null && item.quantity != null) {
-            val resultPrice = item.price!! * item.quantity!!
-            if (resultPrice < 10_000) {
-                bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
-            }
-        }
-
-        if (bindingResult.hasErrors()) {
-            logger.info { "errors: ${bindingResult}" }
-            return "validation/v3/addForm"
-        }
-
-        val savedItem = itemRepository.save(item)
-
-        redirectAttributes.addAttribute("itemId", savedItem.id)
-        redirectAttributes.addAttribute("status", true)
-        return "redirect:/validation/v3/items/{itemId}"
-    }
-
+    // ModelAttribute <- item 지정을 해야 한다.
     @PostMapping("/add")
     fun addItem2(
-        @Validated(SaveCheck::class) @ModelAttribute item: Item,
+        @Validated @ModelAttribute("item") form: ItemSaveForm,
         bindingResult: BindingResult,
         redirectAttributes: RedirectAttributes
     ): String {
         // 오브젝트 에러에 대해서는 직접 코드로 구현하는 것이 좋다.
-        if (item.price != null && item.quantity != null) {
-            val resultPrice = item.price!! * item.quantity!!
+        if (form.price != null && form.quantity != null) {
+            val resultPrice = form.price!! * form.quantity!!
             if (resultPrice < 10_000) {
                 bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
             }
@@ -83,14 +58,19 @@ class ValidationItemControllerV3(
 
         if (bindingResult.hasErrors()) {
             logger.info { "errors: ${bindingResult}" }
-            return "validation/v3/addForm"
+            return "items/addForm"
         }
 
-        val savedItem = itemRepository.save(item)
+        val itemParam = Item().apply {
+            itemName = form.itemName
+            price = form.price
+            quantity = form.quantity
+        }
+        val savedItem = itemRepository.save(itemParam)
 
         redirectAttributes.addAttribute("itemId", savedItem.id)
         redirectAttributes.addAttribute("status", true)
-        return "redirect:/validation/v3/items/{itemId}"
+        return "redirect:/items/{itemId}"
     }
 
     @GetMapping("/{itemId}/edit")
@@ -99,17 +79,17 @@ class ValidationItemControllerV3(
             ?: throw RuntimeException("item[${itemId}] NOT FOUND")
 
         model.addAttribute("item", item)
-        return "validation/v3/editForm"
+        return "items/editForm"
     }
 
     @PostMapping("/{itemId}/edit")
     fun edit(
         @PathVariable itemId: Long,
-        @Validated(UpdateCheck::class) @ModelAttribute item: Item,
+        @Validated @ModelAttribute("item") form: ItemUpdateForm,
         bindingResult: BindingResult
     ): String {
-        if (item.price != null && item.quantity != null) {
-            val resultPrice = item.price!! * item.quantity!!
+        if (form.price != null && form.quantity != null) {
+            val resultPrice = form.price!! * form.quantity!!
             if (resultPrice < 10_000) {
                 bindingResult.reject("totalPriceMin", arrayOf(10_000, resultPrice), null)
             }
@@ -117,10 +97,15 @@ class ValidationItemControllerV3(
 
         if (bindingResult.hasErrors()) {
             logger.info { "errors: ${bindingResult}" }
-            return "validation/v3/editForm"
+            return "items/editForm"
         }
 
-        itemRepository.update(itemId, item)
-        return "redirect:/validation/v3/items/{itemId}"
+        val itemParam = Item().apply {
+            itemName = form.itemName
+            price = form.price
+            quantity = form.quantity
+        }
+        itemRepository.update(itemId, itemParam)
+        return "redirect:/items/{itemId}"
     }
 }

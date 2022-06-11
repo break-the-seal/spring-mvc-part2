@@ -1,4 +1,4 @@
-package io.brick.springmvc.web.validation.form
+package io.brick.springmvc.web.item.form
 
 import org.hibernate.validator.constraints.Range
 import javax.validation.constraints.Max

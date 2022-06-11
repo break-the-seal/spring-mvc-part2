@@ -1,4 +1,4 @@
-package io.brick.springmvc.web.validation.form
+package io.brick.springmvc.web.item.form
 
 import org.hibernate.validator.constraints.Range
 import javax.validation.constraints.NotBlank
@@ -15,6 +15,5 @@ data class ItemUpdateForm(
     @field:Range(min = 1_000, max = 1_000_000)
     var price: Int? = null,
 
-    // 수정에서는 자유롭게 변경 가능
     var quantity: Int? = null
 )
