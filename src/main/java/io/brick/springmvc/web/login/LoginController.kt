@@ -6,6 +6,8 @@ import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PostMapping
+import javax.servlet.http.Cookie
+import javax.servlet.http.HttpServletResponse
 import javax.validation.Valid
 
 @Controller
@@ -20,7 +22,8 @@ class LoginController(
     @PostMapping("/login")
     fun login(
         @Valid @ModelAttribute form: LoginForm,
-        bindingResult: BindingResult
+        bindingResult: BindingResult,
+        response: HttpServletResponse
     ): String {
         if (bindingResult.hasErrors()) {
             return "login/loginForm"
@@ -32,8 +35,21 @@ class LoginController(
             return "login/loginForm"
         }
 
-        // 로그인 성공 처리 TODO
+        val idCookie = Cookie("memberId", loginMember.id.toString())
+        response.addCookie(idCookie)
 
         return "redirect:/"
+    }
+
+    @PostMapping("/logout")
+    fun logout(response: HttpServletResponse): String {
+        expireCookie(response, "memberId")
+        return "redirect:/"
+    }
+
+    private fun expireCookie(response: HttpServletResponse, cookieName: String) {
+        val cookie = Cookie(cookieName, null)
+        cookie.maxAge = 0
+        response.addCookie(cookie)
     }
 }
