@@ -49,7 +49,7 @@ class SessionManager {
      * 세션 만료
      */
     fun expire(request: HttpServletRequest) {
-        val sessionCookie = findCookie(request, SESSION_COOKIE_NAME)?.let {
+        findCookie(request, SESSION_COOKIE_NAME)?.let {
             sessionStore.remove(it.value)
         }
     }
