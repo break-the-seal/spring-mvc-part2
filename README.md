@@ -96,3 +96,11 @@ session.setMaxInactiveInterval(1800)
 - 세션 타임아웃은 JSESSIONID 전달하는 HTTP 요청이 있으면 현재 시간으로 다시 초기화
 - `session.getLastAccessedTime()`
 - 마지막 접근 시간 이후로 timeout 시간이 지나면 WAS가 내부에서 해당 세션 제거
+
+<br>
+
+## 📌 Section 6. 로그인 처리1 - 쿠키, 세션
+
+### 서블릿 필터 - 요청 로그
+- 설정파일에 `FilterRegistrationBean` 필터 등록해야 한다.
+- 같은 요청의 로그에 모두 같은 식별자를 자동으로 남기고 싶을 때 `logback mdc` 검색
