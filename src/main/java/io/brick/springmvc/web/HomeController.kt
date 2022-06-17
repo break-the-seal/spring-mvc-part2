@@ -2,6 +2,7 @@ package io.brick.springmvc.web
 
 import io.brick.springmvc.domain.member.Member
 import io.brick.springmvc.domain.member.MemberRepository
+import io.brick.springmvc.web.argumentresolver.Login
 import io.brick.springmvc.web.session.SessionManager
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -65,16 +66,29 @@ class HomeController(
         return "loginHome"
     }
 
-    @GetMapping("/")
+//    @GetMapping("/")
     fun homeLoginV3Spring(
-        @SessionAttribute(name = SessionConstant.LOGIN_MEMBER, required = false) member: Member?,
+        @SessionAttribute(name = SessionConstant.LOGIN_MEMBER, required = false) loginMember: Member?,
         model: Model
     ): String {
-        if (member == null) {
+        if (loginMember == null) {
             return "home"
         }
 
-        model.addAttribute("member", member)
+        model.addAttribute("member", loginMember)
+        return "loginHome"
+    }
+
+    @GetMapping("/")
+    fun homeLoginV3ArgumentResolver(
+        @Login loginMember: Member?,
+        model: Model
+    ): String {
+        if (loginMember == null) {
+            return "home"
+        }
+
+        model.addAttribute("member", loginMember)
         return "loginHome"
     }
 }

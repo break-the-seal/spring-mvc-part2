@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse
 
 class LoginCheckFilter: Filter {
     companion object: KLogging() {
-        val whiteList = arrayOf("/", "/members/add", "/login", "/logout", "/css/*")
+        val whiteList = arrayOf("/", "/members/add", "/login", "/logout", "/*.ico", "/css/*")
     }
 
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
