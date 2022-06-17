@@ -34,9 +34,13 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${kotlinVersion}")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
     implementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+
+    implementation('io.github.microutils:kotlin-logging:2.1.21')
 
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
