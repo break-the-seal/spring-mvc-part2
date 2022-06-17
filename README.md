@@ -8,9 +8,11 @@
 ### 서블릿 예외 처리 - 시작
 - 먼저 애플리케이션에서 발생한 예외가 처리되지 못하고(`try ~ catch`) 서블릿 바깥까지 전달되는 경우를 알아야 한다.
 - 서블릿 바깥은 WAS까지 예외가 도달하는 상황
+
 ```properties
 server.error.whitelabel.enabled=false
 ```
+
 - 스프링 부트가 제공하는 기본 예외 페이지 기능 `false` 처리
 - 톰캣이 예외를 처리하게 된다.
 - `response.sendError(http_status_code, error_description)`
