@@ -1,6 +1,7 @@
 package io.brick.springmvc.web.login
 
 import io.brick.springmvc.domain.login.LoginService
+import io.brick.springmvc.web.SessionConstant
 import io.brick.springmvc.web.login.form.LoginForm
 import io.brick.springmvc.web.session.SessionManager
 import org.springframework.stereotype.Controller
@@ -54,7 +55,7 @@ class LoginController(
     /**
      * 세션을 사용한 로그인 처리
      */
-    @PostMapping("/login")
+//    @PostMapping("/login")
     fun loginV2(
         @Valid @ModelAttribute form: LoginForm,
         bindingResult: BindingResult,
@@ -77,15 +78,49 @@ class LoginController(
         return "redirect:/"
     }
 
+    /**
+     * HttpServlet 세션을 사용한 로그인 처리
+     */
+    @PostMapping("/login")
+    fun loginV3(
+        @Valid @ModelAttribute form: LoginForm,
+        bindingResult: BindingResult,
+        request: HttpServletRequest
+    ): String {
+        if(bindingResult.hasErrors()) {
+            return "/login/loginForm"
+        }
+
+        val loginMember = loginService.login(form.loginId!!, form.password!!)
+        if(loginMember == null) {
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.")
+            return "login/loginForm"
+        }
+
+        // 로그인 성공 처리
+        // 세션이 있다면 -> 존재하는 세션 반환, 세션이 없다면 -> 신규 세션 생성
+        val session = request.session
+        // 세션에 로그인 회원 정보 보관
+        session.setAttribute(SessionConstant.LOGIN_MEMBER, loginMember)
+
+        return "redirect:/"
+    }
+
 //    @PostMapping("/logout")
     fun logout(response: HttpServletResponse): String {
         expireCookie(response, "memberId")
         return "redirect:/"
     }
 
-    @PostMapping("/logout")
+//    @PostMapping("/logout")
     fun logoutV2(request: HttpServletRequest): String {
         sessionManager.expire(request)
+        return "redirect:/"
+    }
+
+    @PostMapping("/logout")
+    fun logoutV3(request: HttpServletRequest): String {
+        request.getSession(false)?.invalidate()
         return "redirect:/"
     }
 
