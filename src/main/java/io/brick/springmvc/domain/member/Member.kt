@@ -6,11 +6,11 @@ data class Member(
     var id: Long = 0L,
 
     @field:NotEmpty
-    var loginId: String,
+    var loginId: String? = null,
 
     @field:NotEmpty
-    var name: String,
+    var name: String? = null,
 
     @field:NotEmpty
-    var password: String
+    var password: String? = null
 )

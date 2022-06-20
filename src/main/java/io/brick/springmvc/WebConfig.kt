@@ -1,5 +1,6 @@
 package io.brick.springmvc
 
+import io.brick.springmvc.web.argumentresolver.LoginMemberArgumentResolver
 import io.brick.springmvc.web.filter.LogFilter
 import io.brick.springmvc.web.filter.LoginCheckFilter
 import io.brick.springmvc.web.interceptor.LogInterceptor
@@ -7,12 +8,17 @@ import io.brick.springmvc.web.interceptor.LoginCheckInterceptor
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import javax.servlet.Filter
 
 @Configuration
 class WebConfig : WebMvcConfigurer {
+
+    override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
+        resolvers.add(LoginMemberArgumentResolver())
+    }
 
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(LogInterceptor())

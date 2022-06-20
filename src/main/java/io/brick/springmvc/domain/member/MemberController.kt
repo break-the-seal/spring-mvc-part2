@@ -15,7 +15,7 @@ class MemberController(
 ) {
 
     @GetMapping("/add")
-    fun addForm(@ModelAttribute("member") member: Member): String {
+    fun addForm(@ModelAttribute("member") member: Member?): String {
         return "members/addMemberForm"
     }
 

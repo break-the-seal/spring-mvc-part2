@@ -2,6 +2,7 @@ package io.brick.springmvc.web
 
 import io.brick.springmvc.domain.member.Member
 import io.brick.springmvc.domain.member.MemberRepository
+import io.brick.springmvc.web.argumentresolver.Login
 import io.brick.springmvc.web.session.SessionManager
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
@@ -76,9 +77,27 @@ class HomeController(
     /**
      * Spring에서 제공하는 세션을 통한 로그인
      */
-    @GetMapping("/")
+//    @GetMapping("/")
     fun homeLoginV3Spring(
-        @SessionAttribute(name = SessionConstant.LOGIN_MEMBER, required = false) loginMember: Member,
+        @SessionAttribute(name = SessionConstant.LOGIN_MEMBER, required = false) loginMember: Member?,
+        model: Model
+    ): String {
+
+        if(loginMember == null) {
+            return "home"
+        }
+        model.addAttribute("member", loginMember)
+
+        return "loginHome"
+    }
+
+    /**
+     * ArgumentResolver를 통한 로그인
+     *  - @Login 어노테이션 하나로 로그인된 회원의 정보를 가져올 수 있음
+     */
+    @GetMapping("/")
+    fun homeLoginV3ArgumentResolver(
+        @Login loginMember: Member?,
         model: Model
     ): String {
 
