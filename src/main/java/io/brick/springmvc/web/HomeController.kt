@@ -16,7 +16,7 @@ class HomeController(
     private val sessionManager: SessionManager
 ) {
 
-    @GetMapping("/")
+//    @GetMapping("/")
     fun home(): String {
         return "home"
     }
