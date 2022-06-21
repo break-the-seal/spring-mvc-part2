@@ -126,3 +126,16 @@ server:
 - 혹여나 공통 처리 컨트롤러 기능을 customize 하고 싶을 때
   - `ErrorController` 인터페이스 구현
   - `BasicErrorController` 상속 기능 추가
+
+<br>
+
+## 📌 섹션 9. API 예외 처리
+
+### 시작
+- @RestController api 전용 컨트롤러 대상
+- 위에 상태로 RuntimeException 발생시 `/error-page/500`에서 html 코드 자체를 반환하게 된다.
+```kotlin
+@RequestMapping(value = ["/error-page/500"], produces = [MediaType.APPLICATION_JSON_VALUE])
+```
+- `Accept: application/json`을 통해 `ResponseEntity`를 반환받게 한다.
+- JSON 형태로 에러 응답을 받게 된다.
