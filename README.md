@@ -69,3 +69,60 @@ filterRegistrationBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType
 5. request: DispatcherType[ERROR] <<
 6. response: DispatcherType[ERROR] <<
 ```
+- `DispatcherType`을 `REQUEST`, `ERROR` 두 개 설정한 경우에 해당
+
+### 서블릿 예외 처리 - 인터셉터
+```text
+> 1. 컨트롤러 예외 발생 -> 인터셉터 -> 서블릿 -> 필터 -> WAS(tomcat): WAS까지 예외 전파  
+> 2. WAS(tomcat) `/error-page/500` 다시 요청 -> 필터(x) -> 서블릿 -> 인터셉터(x) -> 컨트롤러 `/error-page/500` 호출 -> View render
+```
+- 인터셉터에서도 등록시 `excludePathPatterns`에 error-page 경로를 등록하면 인터셉터도 통과한다. 
+
+> 결국 WAS에서 에러 페이지를 다시 내부 호출할 때에는 필터, 인터셉터 둘다 사용하지 않고도 호출이 가능해진다.
+
+### 스프링 부트 - 오류 페이지 1
+- 위의 서블릿 예외처리는 번거롭다.
+  - `WebServerCustomizer`를 통해 에러와 에러 페이지를 매핑
+  - 에러 페이지를 위한 `ErrorPageController`를 따로 구성
+- 스프링 부트는 이런 과정을 기본으로 제공
+  - `ErrorPage` 자동 등록(`/error`, 기본 설정 에러 경로)
+  - 예외 발생 혹은 `response.sendError(...)` 발생시 모두 `/error` 호출
+  - `BasicErrorController` 자동 등록: `/error`경로를 매핑해서 처리하는 컨트롤러
+- `ErrorMvcAutoConfiguration`: 여기서 오류 페이지를 자동 등록
+
+#### 뷰 선택 우선순위(`BasicErrorController`)
+1. 뷰 템플릿
+   - `resources/templates/error/500.html`
+   - `resources/templates/error/5xx.html`
+2. 정적 리소스(static, public)
+   - `resources/static/error/400.html`
+   - `resources/static/error/404.html`
+   - `resources/static/error/4xx.html`
+3. 적용 대상이 없을 때 뷰 이름(error)
+   - `resources/templates/error.html`
+
+### 스프링 부트 - 오류 페이지 2
+- `BasicErrorController` 여기에서 model에 담아 에러 관련 여러 정보들을 뷰에 전달해준다.
+```html
+<li th:text="|timestamp: ${timestamp}|"></li>
+<li th:text="|path: ${path}|"></li>
+<li th:text="|status: ${status}|"></li>
+<li th:text="|message: ${message}|"></li>
+<li th:text="|error: ${error}|"></li>
+<li th:text="|exception: ${exception}|"></li>
+<li th:text="|errors: ${errors}|"></li>
+<li th:text="|trace: ${trace}|"></li>
+```
+- 여기서 몇개는 null로 나온다. (오류 관련 내부 정보들을 사용자에게 노출하는 것은 보안상 문제 발생)
+- yaml 설정에서 이를 조절할 수 있다.
+```yaml
+server:
+  error:
+    include-exception: true
+    include-message: always
+    include-stacktrace: always
+    include-binding-errors: always
+```
+- 혹여나 공통 처리 컨트롤러 기능을 customize 하고 싶을 때
+  - `ErrorController` 인터페이스 구현
+  - `BasicErrorController` 상속 기능 추가
