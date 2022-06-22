@@ -2,9 +2,12 @@ package io.brick.springmvc
 
 import io.brick.springmvc.filter.LogFilter
 import io.brick.springmvc.interceptor.LogInterceptor
+import io.brick.springmvc.resolver.MyHandlerExceptionResolver
+import io.brick.springmvc.resolver.UserHandlerExceptionResolver
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.servlet.HandlerExceptionResolver
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import javax.servlet.DispatcherType
@@ -19,6 +22,11 @@ class WebConfig: WebMvcConfigurer {
             // filter 같이 dispatcherType으로 설정 불가능
             // exclude할 path로 지정
             .excludePathPatterns("/css/**", "*.ico", "/error", "/error-page/**")
+    }
+
+    override fun extendHandlerExceptionResolvers(resolvers: MutableList<HandlerExceptionResolver>) {
+        resolvers.add(MyHandlerExceptionResolver())
+        resolvers.add(UserHandlerExceptionResolver())
     }
 
     @Bean

@@ -139,3 +139,54 @@ server:
 ```
 - `Accept: application/json`을 통해 `ResponseEntity`를 반환받게 한다.
 - JSON 형태로 에러 응답을 받게 된다.
+
+### 스프링 부트 기본 오류 처리
+- 스프링 부트에서 `BasicErrorController`에서 기본적으로 API에 대한 오류 처리도 자동으로 수행해준다.
+- `Accept` header에 따라 오류 응답을 다르게 받아 볼 수 있다.
+  - `text/html`, `application/json`
+```java
+// text/html 경우 (/templates/error/... 경로에 있는 html을 보여준다.)
+@RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
+public ModelAndView errorHtml(HttpServletRequest request, HttpServletResponse response) {...}
+// 그외의 경우 ResponseEntity에 여러 에러 관련 정보들을 넣어서 응답(status, timestamp, error, ...)
+@RequestMapping
+public ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {...}
+```
+- `BasicErrorController`를 확장해서 JSON 메시지를 변경할 수도 있다는 것만 알아두자.
+- `BasicErrorController` 기능은 HTML 페이지 제공하는 경우에만 사용
+- `@ExceptionHandler` API 오류 처리할 때는 어노테이션 방식으로 사용
+
+### HandlerExceptionResolver 시작
+- 컨트롤러에서 `IllegalArgumentException` 던지면 `500` 에러 응답(서버에서 발생한 에러이기에)
+- 이것을 `4xx` 에러로 변경할 수 있다.
+
+![Screen Shot 2022-06-23 at 12 04 08 AM](https://user-images.githubusercontent.com/41675375/175072463-cb4b7713-646b-4556-8df5-11362b8b76e8.png)
+
+```kotlin
+if (ex is IllegalArgumentException) {
+    logger.info { "IllegalArgumentException resolver to 400" }
+    response.sendError(HttpServletResponse.SC_BAD_REQUEST, ex.message)
+    return ModelAndView()
+}
+```
+- HandlerExceptionResolver 인터페이스 구현체 내용
+- `ModelAndView` 반환하는 것은 try ~ catch 하듯이 Exception을 처리해서 정상 흐름처럼 변경  
+(WAS에는 정상 응답, `sendError` 보고 다시 `/error` 호출)
+- 반환 내용에 따라 달라짐
+  - `ModelAndView()`: 뷰 랜더링 X, WAS에 정상 흐름 응답
+  - `ModelAndView(...)`: 뷰 랜더링
+  - `null`: 다음 ExceptionResolver를 찾음, 없는 경우 예외 처리 X, 서블릿 바깥으로 예외 던지게 됨
+- `ExceptionHandler`에서 다양하게 처리 가능
+  - 예외 상태코드 변환: `response.sendError(...)`를 통해 서블릿에서 상태 코드에 따른 오류 처리하도록 위임
+  - 뷰 템플릿 처리: 바로 오류 화면을 사용자에게 제공
+  - API 응답 처리: `response.writer.println("message")` HTTP 응답 바디에 데이터 직접 넣어주는 것도 가능  
+    (json 형태로 담아서 응답 가능)
+- `WebConfig`
+  - `extendHandlerExceptionResolvers` 이걸 사용하자(`configureHandlerExceptionResolvers` X)
+
+### HandlerExceptionResolver 활용
+- 예외 발생 > WAS까지 예외 전달 > WAS 오류 페이지 정보 조회 > `/error` 호출
+- 이 과정 자체가 복잡
+- `ExceptionHandler`을 통해 여기서 깔끔하게 예외 처리를 끝낼 수 있다.  
+(`UserHandlerExceptionResolver` 참고)
+- 하지만 복잡하게 구현을 해야되는데 **스프링이 제공하는** `ExceptionHandler`를 사용하면 간편하게 적용가능
