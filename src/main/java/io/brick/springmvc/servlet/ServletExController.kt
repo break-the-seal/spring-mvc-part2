@@ -21,6 +21,11 @@ class ServletExController {
         response.sendError(HttpStatus.NOT_FOUND.value(), "404 error!")
     }
 
+    @GetMapping("/error-400")
+    fun error400(response: HttpServletResponse) {
+        response.sendError(HttpStatus.BAD_REQUEST.value() , "400 error!")
+    }
+
     @GetMapping("/error-500")
     fun error500(response: HttpServletResponse) {
         response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "500 error!")
