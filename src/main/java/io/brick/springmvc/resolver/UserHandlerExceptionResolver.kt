@@ -11,9 +11,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class UserHandlerExceptionResolver: HandlerExceptionResolver {
-    companion object: KLogging() {
-
-    }
+    companion object: KLogging()
 
     private val objectMapper = ObjectMapper()
 

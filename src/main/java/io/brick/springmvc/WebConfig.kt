@@ -14,7 +14,7 @@ import javax.servlet.DispatcherType
 import javax.servlet.Filter
 
 @Configuration
-class WebConfig: WebMvcConfigurer {
+class WebConfig : WebMvcConfigurer {
     override fun addInterceptors(registry: InterceptorRegistry) {
         registry.addInterceptor(LogInterceptor())
             .order(1)
@@ -37,7 +37,7 @@ class WebConfig: WebMvcConfigurer {
         filterRegistrationBean.addUrlPatterns("/*")
         // 여기서 filter에 DispatcherType 적용 가능(어떤 타입에 필터를 적용할 것인지 설정)
         // 기본값은 "REQUEST"만 설정
-        // filterRegistrationBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ERROR)
+        filterRegistrationBean.setDispatcherTypes(DispatcherType.REQUEST, DispatcherType.ERROR)
 
         return filterRegistrationBean
     }

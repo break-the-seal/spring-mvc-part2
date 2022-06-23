@@ -176,7 +176,7 @@ if (ex is IllegalArgumentException) {
   - `ModelAndView()`: 뷰 랜더링 X, WAS에 정상 흐름 응답
   - `ModelAndView(...)`: 뷰 랜더링
   - `null`: 다음 ExceptionResolver를 찾음, 없는 경우 예외 처리 X, 서블릿 바깥으로 예외 던지게 됨
-- `ExceptionHandler`에서 다양하게 처리 가능
+- `ExceptionResolver`에서 다양하게 처리 가능
   - 예외 상태코드 변환: `response.sendError(...)`를 통해 서블릿에서 상태 코드에 따른 오류 처리하도록 위임
   - 뷰 템플릿 처리: 바로 오류 화면을 사용자에게 제공
   - API 응답 처리: `response.writer.println("message")` HTTP 응답 바디에 데이터 직접 넣어주는 것도 가능  
@@ -187,6 +187,21 @@ if (ex is IllegalArgumentException) {
 ### HandlerExceptionResolver 활용
 - 예외 발생 > WAS까지 예외 전달 > WAS 오류 페이지 정보 조회 > `/error` 호출
 - 이 과정 자체가 복잡
-- `ExceptionHandler`을 통해 여기서 깔끔하게 예외 처리를 끝낼 수 있다.  
+- `ExceptionResolver`을 통해 여기서 깔끔하게 예외 처리를 끝낼 수 있다.  
 (`UserHandlerExceptionResolver` 참고)
 - 하지만 복잡하게 구현을 해야되는데 **스프링이 제공하는** `ExceptionHandler`를 사용하면 간편하게 적용가능
+
+### 스프링이 제공하는 ExceptionResolver 1
+- 스프링 부트가 기본적으로 제공하는 `ExceptionHandler`(우선순위 기준)
+  - `ExceptionHandlerExceptionResolver`
+    - `@ExceptionHandler` 처리(대부분 이 기능 사용)
+  - `ResponseStatusExceptionResolver`
+    - HTTP 상태코드 지정(`@ResponseStatus(value = HttpStatus.NOT_FOUND)`)
+  - `DefaultHandlerExceptionResolver` -> 우선순위 가장 낮다
+
+#### ResponseStatusExceptionResolver
+- `@ResponseStatus`가 있는 예외
+  - `response.sendError`를 통해 처리
+  - yaml 설정파일에 `include-message: always` 하면 설정한 메시지도 응답으로 보내준다.
+  - `BadRequestException` 참고(`MessageSource` 기능도 사용)
+- `ResponseStatusException` 예외
