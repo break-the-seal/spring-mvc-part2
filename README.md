@@ -205,3 +205,43 @@ if (ex is IllegalArgumentException) {
   - yaml 설정파일에 `include-message: always` 하면 설정한 메시지도 응답으로 보내준다.
   - `BadRequestException` 참고(`MessageSource` 기능도 사용)
 - `ResponseStatusException` 예외
+
+### 스프링이 제공하는 ExceptionResolver 2
+
+#### DefaultHandlerExceptionResolver
+- 스프링 내부에서 발생한 예외를 처리해주는 `ExceptionResolver`
+- 대표적으로 `TypeMismatchException`
+  - `500` 에러로 처리가 되는데 스프링은 이것을 `400(Bad Request)` 에러로 변환해서 반환해준다.
+
+### @ExceptionHandler
+#### API 예외 처리에 있어서 어려운 점
+- `HandlerExceptionResolver`에서 `ModelAndView`를 반환해야 한다는 점(API에선 불필요)
+- response에 직접 응답 데이터를 넣어주는 작업 필요(`UserHandlerExceptionResolver` 참고)
+- 특정 컨트롤러에서만 발생하는 예외 별도 처리가 어려움(도메인 별 에러를 따로 관리하고 싶을 때)
+- `@ExceptionHandler`가 이러한 어려운 점들을 해결해줌
+
+```kotlin
+@ExceptionHandler(IllegalArgumentException::class)
+fun illegalExHandler(e: IllegalArgumentException): ErrorResult {
+    logger.info { "[exceptionHandler] ex $e" }
+    return ErrorResult("BAD", e.message)
+}
+```
+- 이것만 설정하면 `200 OK` 정상 응답이 되어버림(예외를 잡아서 response 해준 것이기에)
+- `@ResponseStatus` 를 붙여야 한다.
+
+```kotlin
+@ExceptionHandler
+fun userExHandler(e: UserException): ResponseEntity<ErrorResult> {
+    logger.error { "[exceptionHandler] ex $e" }
+    val errorResult = ErrorResult("USER-EX", e.message)
+    return ResponseEntity(errorResult, HttpStatus.BAD_REQUEST)
+}
+```
+- `@ExceptionHandler` 지정한 예외를 생략하면 인자에 지정한 예외를 핸들링 해준다.(`UserException`)
+- `@ExceptionHandler` 여기에 잡은 Exception의 자식 클래스까지 전부 핸들링 가능
+```kotlin
+@ExceptionHandler(AException::class, BException::class)
+```
+- 여러 개의 예외를 한꺼번에 핸들링 할 수 있다.
+

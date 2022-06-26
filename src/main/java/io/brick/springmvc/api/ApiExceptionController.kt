@@ -6,6 +6,7 @@ import mu.KLogging
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 
@@ -32,6 +33,11 @@ class ApiExceptionController {
     @GetMapping("/api/response-status-ex2")
     fun responseStatusEx2(): String {
         throw ResponseStatusException(HttpStatus.NOT_FOUND, "error.bad", IllegalArgumentException())
+    }
+
+    @GetMapping("/api/default-handler-ex")
+    fun defaultException(@RequestParam data: Int): String {
+        return "ok"
     }
 
 }
