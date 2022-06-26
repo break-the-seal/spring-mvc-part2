@@ -177,9 +177,12 @@ if (ex is IllegalArgumentException) {
   - `ModelAndView(...)`: 뷰 랜더링
   - `null`: 다음 ExceptionResolver를 찾음, 없는 경우 예외 처리 X, 서블릿 바깥으로 예외 던지게 됨
 - `ExceptionResolver`에서 다양하게 처리 가능
-  - 예외 상태코드 변환: `response.sendError(...)`를 통해 서블릿에서 상태 코드에 따른 오류 처리하도록 위임
-  - 뷰 템플릿 처리: 바로 오류 화면을 사용자에게 제공
-  - API 응답 처리: `response.writer.println("message")` HTTP 응답 바디에 데이터 직접 넣어주는 것도 가능  
+  - 예외 상태코드 변환  
+  `response.sendError(...)`를 통해 서블릿에서 상태 코드에 따른 오류 처리하도록 위임
+  - 뷰 템플릿 처리  
+  바로 오류 화면을 사용자에게 제공
+  - API 응답 처리  
+  `response.writer.println("message")` HTTP 응답 바디에 데이터 직접 넣어주는 것도 가능  
     (json 형태로 담아서 응답 가능)
 - `WebConfig`
   - `extendHandlerExceptionResolvers` 이걸 사용하자(`configureHandlerExceptionResolvers` X)
@@ -212,6 +215,7 @@ if (ex is IllegalArgumentException) {
 - 스프링 내부에서 발생한 예외를 처리해주는 `ExceptionResolver`
 - 대표적으로 `TypeMismatchException`
   - `500` 에러로 처리가 되는데 스프링은 이것을 `400(Bad Request)` 에러로 변환해서 반환해준다.
+- `response.sendError(...)`로 해결
 
 ### @ExceptionHandler
 #### API 예외 처리에 있어서 어려운 점
@@ -245,3 +249,12 @@ fun userExHandler(e: UserException): ResponseEntity<ErrorResult> {
 ```
 - 여러 개의 예외를 한꺼번에 핸들링 할 수 있다.
 
+### @ControllerAdvice
+- 여러 컨트롤러에서 발생하는 에러들을 한꺼번에 처리해준다.
+
+#### 특정 컨트롤러만 지정
+```kotlin
+@ControllerAdvice(annotations = [RestController::class]) // 특정 어노테이
+@ControllerAdvice("org.example.controllers") // 특정 패키지(하위 패키지 포함)
+@ControllerAdvice(assignableTypes = [ControllerInterface::class, AbstracController::class]) // 특정 컨트롤러 타입(하위 클래스 포함)
+```
