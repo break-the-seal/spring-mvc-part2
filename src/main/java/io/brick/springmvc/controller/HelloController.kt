@@ -1,5 +1,6 @@
 package io.brick.springmvc.controller
 
+import io.brick.springmvc.type.IpPort
 import mu.KLogging
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -22,6 +23,14 @@ class HelloController {
     @GetMapping("/hello-v2")
     fun helloV2(@RequestParam data: Int): String {
         logger.info { "data $data" }
+        return "ok"
+    }
+
+    @GetMapping("/ip-port")
+    fun ipPort(@RequestParam ipPort: IpPort): String {
+        logger.info { "ipPort IP = ${ipPort.ip}" }
+        logger.info { "ipPort PORT = ${ipPort.port}" }
+
         return "ok"
     }
 }
