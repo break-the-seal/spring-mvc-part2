@@ -80,3 +80,22 @@ conversionService.convert("10", Int::class.java)
 - `Converter`: 범용적으로 사용가능 (객체 -> 객체)
 - `Formatter`: 문자에 특화 (객체 -> 문자, 문자 -> 객체, Locale 현지화)
   - `Converter`의 특별한 버전
+
+### 포멧터를 지원하는 컨버젼 서비스
+- `FormattingConversionService`: 포멧터 지원하는 컨버젼 서비스
+- `DefaultFormattingConversionService` 기본적인 숫자, 통화 포멧을 지원
+- 해당 컨버젼 서비스에 컨버터, 포멧터 둘다 등록 가능
+- 스프링은 `DefaultFormattingConversionService`를 상속받은 `WebConversionService`를 내부에서 사용
+
+### 스프링에서 제공하는 기본 포멧터
+- `Formatter`(springframework) 인터페이스의 구현체들을 확인
+- 기본 형식말고 다른 형식으로 지정하고 싶을 때는 애노테이션 방식의 포멧터를 사용할 수 있다.
+  - `@NumberFormat`: `NumberFormatAnnotationFormatterFactory`
+  - `@DateTimeFormat`: `Jsr310DateTimeFormatAnnotationFormatterFactory`
+
+### 정리
+- 컨버터, 포멧터를 컨버젼 서비스를 통해 일관성 있게 사용 가능
+- **`HttpMessageConverter`에는 `ConversionService` 적용 X**
+  - Jackson 라이브러리에 의존하기 때문에 컨버젼 서비스에서 적용되는 것이 아니다.
+  - JSON 관련 숫자, 날짜 등의 포멧은 Jackson 라이브러리에서 제공해주는 것을 사용해야 한다.
+- 컨버젼 서비스: `@RequestParam`, `@ModelAttribute`, `@PathVariable`, view template 에 적용
