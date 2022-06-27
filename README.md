@@ -49,3 +49,34 @@ conversionService.convert("10", Int::class.java)
 - Config 설정을 통해 converter를 스프링에 등록할 수 있다.
 - 스프링은 수많은 기본 컨버터들을 제공, 컨버터를 추가하면 기본 컨버터보다 높은 우선순위를 가지게 됨
 - `@RequestParam`: 이것을 처리하는 `ArgumentResolver`(`RequestParamMethodArgumentResolver`) 여기에서 `ConversionService`를 사용해 타입 변환
+
+### 뷰 템플릿에 Converter 적용하기
+```html
+<li>${ipPort}: <span th:text="${ipPort}" ></span></li>
+<li>${{ipPort}}: <span th:text="${{ipPort}}" ></span></li>
+```
+- `${...}`
+  - 변수 표현식
+  - 컨버터 사용 X
+  - 객체 타입, hashcode 값이 나옴(`toString` 값)
+- `${{...}}`
+  - 컨버전 서비스 적용
+  - `127:0.0.1:8080`
+
+```html
+<form th:object="${form}" th:method="post">
+    th:field <input type="text" th:field="*{ipPort}"><br/>
+    th:value <input type="text" th:value="*{ipPort}">(보여주기 용도)<br/>
+    <input type="submit"/>
+</form>
+```
+- thymeleaf에서는 `th:field` 적용시 converter가 적용이 된다.
+
+> 뷰 템플릿 정리  
+> - `IpPort` 객체 -> model(`IpPort` -> string 컨버터 사용)
+> - string -> `IpPort` 객체(string -> `IpPort` 컨버터, `@ModelAttribute`)
+
+### 포멧터 - Formatter
+- `Converter`: 범용적으로 사용가능 (객체 -> 객체)
+- `Formatter`: 문자에 특화 (객체 -> 문자, 문자 -> 객체, Locale 현지화)
+  - `Converter`의 특별한 버전
