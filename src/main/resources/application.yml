@@ -1,0 +1,13 @@
+#logging:
+#  level:
+#    org.apache.coyote.http11: debug
+
+# multipart \uAE30\uB2A5\uC744 \uB04C \uC218 \uC788\uC74C (default: true)
+#spring:
+#  servlet:
+#    multipart:
+#      enabled: false
+
+# \uD30C\uC77C \uC800\uC7A5 \uACBD\uB85C
+file:
+  dir: /Users/beanie.joy/Documents/study/
